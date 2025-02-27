@@ -9,7 +9,8 @@ st.set_page_config(page_title="Análisis de Riesgo Crediticio", layout="wide")
 
 # ---- Título de la aplicación ----
 st.title("📋 Análisis Avanzado de Riesgo Crediticio")
-st.markdown("Evalúa la **probabilidad de default (PD), pérdida dada el default (LGD) y exposición al default (EAD)** con modelos financieros reales.")
+st.markdown(
+    "Evalúa la **probabilidad de default (PD), pérdida dada el default (LGD) y exposición al default (EAD)** con modelos financieros reales.")
 
 # ================= SECCIÓN: DATOS PERSONALES ===================
 st.header("📌 Datos Personales")
@@ -40,7 +41,8 @@ st.header("🏦 Datos del Crédito Solicitado")
 limite_credito = st.number_input("Límite Total de Crédito ($)", min_value=0, step=1000)
 uso_actual_credito = st.number_input("Uso Actual del Crédito (%)", min_value=0, max_value=100, step=1)
 tarjetas_credito = st.number_input("Número de Tarjetas de Crédito", min_value=0, step=1)
-tipo_credito = st.selectbox("Tipo de Crédito Solicitado", ["Hipotecario", "Automotriz", "Consumo", "Empresarial", "Educativo"])
+tipo_credito = st.selectbox("Tipo de Crédito Solicitado",
+                            ["Hipotecario", "Automotriz", "Consumo", "Empresarial", "Educativo"])
 monto_credito = st.number_input("Monto del Crédito Solicitado ($)", min_value=0, step=100)
 plazo_credito = st.number_input("Plazo del Crédito (meses)", min_value=6, max_value=360, step=6)
 
@@ -48,14 +50,13 @@ plazo_credito = st.number_input("Plazo del Crédito (meses)", min_value=6, max_v
 if st.button("📊 Evaluar Riesgo"):
 
     # ---- Cálculo de PD ----
-    coeficientes = [-2.5, 0.01, -0.5, 1.2, 0.8, -0.3, -0.7, 0.5, 1.1, 0.9]  # 10 elementos
+    coeficientes = [-2.5, 0.01, -0.5, 1.2, 0.8, -0.3, -0.7, 0.5, 1.1, 0.9]
     x_values = np.array([
         edad / 100, ingreso_mensual / 10000, cuentas_credito / 10,
         cuentas_morosas / 5, uso_actual_credito / 100, deuda_actual / 50000,
         tiempo_credito / 50, pagos_atrasados / 12, bancarrotas, consultas_credito / 10
-    ])  # 10 elementos ahora!
+    ])
 
-    # Aplicamos el modelo logístico correctamente
     logit_pd = np.dot(coeficientes, x_values)
     pd_score = 1 / (1 + np.exp(-logit_pd))  # Transformación logística
 
@@ -78,12 +79,41 @@ if st.button("📊 Evaluar Riesgo"):
     st.write(f"**Exposición al Default (EAD):** ${ead:,.2f}")
     st.write(f"**Pérdida Esperada (EL):** ${el:,.2f}")
 
-# ================= EXPLICACIÓN FINAL ===================
-st.header("📖 ¿Qué significan PD, LGD y EAD?")
-st.markdown("""
-- **PD (Probabilidad de Default):** Probabilidad de incumplimiento.
-- **LGD (Pérdida Dada el Default):** Porcentaje de pérdida en caso de incumplimiento.
-- **EAD (Exposición al Default):** Monto de deuda expuesto en incumplimiento.
-""")
+    # =================== GRÁFICOS ===================
+    st.subheader("📊 Análisis Financiero")
 
-st.markdown("### 📌 Elaborado por: [Alexander Haro](https://scholar.google.com/citations?user=dFRviMUAAAAJ&hl=es&authuser=1&oi=ao)")
+    col1, col2 = st.columns(2)
+
+    # Gráfico de pastel - Distribución Financiera
+    with col1:
+        fig_pie_finanzas = px.pie(
+            names=["Ingresos", "Gastos", "Deuda"],
+            values=[ingreso_mensual, gastos_mensuales, deuda_actual],
+            title="Distribución Financiera"
+        )
+        st.plotly_chart(fig_pie_finanzas)
+
+    # Gráfico de pastel - Uso del Crédito
+    with col2:
+        fig_pie_credito = px.pie(
+            names=["Límite de Crédito Usado", "Disponible"],
+            values=[uso_actual_credito, 100 - uso_actual_credito],
+            title="Uso del Crédito"
+        )
+        st.plotly_chart(fig_pie_credito)
+
+    # Gráfico de barras - Comparación de Indicadores Financieros
+    with col1:
+        indicadores = ["Ingresos", "Gastos", "Deuda", "Ahorros", "Límite Crédito"]
+        valores = [ingreso_mensual, gastos_mensuales, deuda_actual, ahorros_disponibles, limite_credito]
+        fig_barras = px.bar(x=indicadores, y=valores, title="Comparación de Indicadores Financieros")
+        st.plotly_chart(fig_barras)
+
+    # Gráfico de barras - Relación Deuda/Patrimonio
+    with col2:
+        fig_barras_ratio = px.bar(
+            x=["Deuda", "Patrimonio Neto"],
+            y=[deuda_actual, patrimonio_neto],
+            title="Relación Deuda vs Patrimonio"
+        )
+        st.plotly_chart(fig_barras_ratio)
