@@ -24,10 +24,7 @@ gastos_mensuales = st.number_input("Gastos Mensuales ($)", min_value=0, step=100
 deuda_actual = st.number_input("Deuda Actual Total ($)", min_value=0, step=100)
 patrimonio_neto = st.number_input("Patrimonio Neto ($)", min_value=0, step=1000)
 ahorros_disponibles = st.number_input("Ahorros Disponibles ($)", min_value=0, step=100)
-ingresos_adicionales = st.number_input("Ingresos Adicionales Mensuales ($)", min_value=0, step=100)
 historial_empleo = st.number_input("Años en el Empleo Actual", min_value=0, max_value=50, step=1)
-pago_hipoteca = st.number_input("Pago Mensual de Hipoteca ($)", min_value=0, step=100)
-renta_mensual = st.number_input("Pago Mensual de Renta ($)", min_value=0, step=100)
 
 # ================= SECCIÓN: HISTORIAL CREDITICIO ===================
 st.header("📊 Historial Crediticio")
@@ -51,13 +48,15 @@ plazo_credito = st.number_input("Plazo del Crédito (meses)", min_value=6, max_v
 if st.button("📊 Evaluar Riesgo"):
 
     # ---- Cálculo de PD ----
-    coeficientes = [-2.5, 0.01, -0.5, 1.2, 0.8, -0.3, -0.7, 0.5, 1.1, 0.9]  # Basado en estudios financieros
+    coeficientes = [-2.5, 0.01, -0.5, 1.2, 0.8, -0.3, -0.7, 0.5, 1.1, 0.9]  # 10 elementos
     x_values = np.array([
         edad / 100, ingreso_mensual / 10000, cuentas_credito / 10,
         cuentas_morosas / 5, uso_actual_credito / 100, deuda_actual / 50000,
         tiempo_credito / 50, pagos_atrasados / 12, bancarrotas, consultas_credito / 10
-    ])
-    logit_pd = coeficientes[0] + np.dot(coeficientes[1:], x_values)
+    ])  # 10 elementos ahora!
+
+    # Aplicamos el modelo logístico correctamente
+    logit_pd = np.dot(coeficientes, x_values)
     pd_score = 1 / (1 + np.exp(-logit_pd))  # Transformación logística
 
     # ---- Cálculo de LGD ----
