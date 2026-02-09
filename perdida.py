@@ -8,9 +8,9 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Análisis de Riesgo Crediticio", layout="wide")
 
 # ---- Título de la aplicación ----
-st.title("📋 Análisis Avanzado de Riesgo Crediticio")
+st.title("📋 **Risk Map Coop 360**")
 st.markdown(
-    "Evalúa la **probabilidad de default (PD), pérdida dada el default (LGD) y exposición al default (EAD)** con modelos financieros reales.")
+    "Sistema integral de análisis financiero y evaluación estadística del riesgo cooperativo")
 
 # ================= SECCIÓN: DATOS PERSONALES ===================
 st.header("📌 Datos Personales")
@@ -117,3 +117,4 @@ if st.button("📊 Evaluar Riesgo"):
             title="Relación Deuda vs Patrimonio"
         )
         st.plotly_chart(fig_barras_ratio)
+
